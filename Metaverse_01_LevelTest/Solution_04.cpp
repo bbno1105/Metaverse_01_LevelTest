@@ -23,7 +23,7 @@
 
 using namespace std;
 
-int arr[5] = { 5, 2, 4, 1, 3 };
+int arr[7] = { 1, 1, 5, 2, 4, 8, 3 };
 
  void sortArray(int* arr, int n)
  {
@@ -44,7 +44,7 @@ int arr[5] = { 5, 2, 4, 1, 3 };
 
 		 for (int j = 0; j < vec.size(); j++)
 		 {
-			 if (*(vec.begin() + j) > arr[i])
+			 if (*(vec.begin() + j) >= arr[i])
 			 {
 				 vec.insert(vec.begin() + j, arr[i]);
 				 break;
@@ -60,7 +60,11 @@ int arr[5] = { 5, 2, 4, 1, 3 };
 
  int main()
  {
-	 sortArray(arr, 5);
+	 sortArray(arr, 7);
+	 for (int i = 0; i < 7; i++)
+	 {
+		 cout << arr[i];
+	 }
  }
 
  // arr : [ 1, 2, 3, 4, 5 ]
