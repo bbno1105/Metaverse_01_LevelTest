@@ -34,65 +34,115 @@
 
 using namespace std;
 
-int bingo[5][5] = { 0 };
-int bingoCount = 0;
-int selectNumber = 0;
-
-void CreateBing(int& _bingo)
+class Bingo
 {
-	while (true)
-	{
-		bool isOverlap = false;
-		int bingoNumber = rand() % 25 + 1;
+private:
+	int* bingo;
+	int bingoCount = 0;
+	int size = 0;
 
-		for (int i = 0; i < 5; i++)
+public:
+	void Create(int _size)
+	{
+		size = _size;
+		bingo = new int[size * size];
+		bool* isUsed = new bool[size * size];
+		memset(isUsed, false, size * size);
+		int bingoNumber = 0;
+
+		for (int i = 0; i < size * size; i++)
 		{
-			for (int j = 0; j < 5; j++)
+			do
 			{
-				if (bingo[i][j] == bingoNumber)
+				bingoNumber = rand() % (size * size) + 1;
+
+			} while (isUsed[bingoNumber - 1]);
+			isUsed[bingoNumber - 1] = true;
+			bingo[i] = bingoNumber;
+		}
+		delete[] isUsed;
+	}
+
+	void Select(int _selectNumber)
+	{
+		for (int i = 0; i < size * size; i++)
+		{
+			if (bingo[i] == _selectNumber)
+			{
+				bingo[i] = 0;
+			}
+		}
+	}
+
+	void CheckBingo()
+	{
+		bingoCount = 0;
+		bool isBingo = false;
+
+		// 가로 빙고
+		for (int i = 0; i < size; i++)
+		{
+			isBingo = true;
+			for (int j = 0; j < size; j++)
+			{
+				if (bingo[i * size + j] != 0)
 				{
-					isOverlap = true;
+					isBingo = false;
+					break;
+				}
+			}
+			if (isBingo)
+			{
+				bingoCount++;
+			}
+		}
+
+		// 세로 빙고
+		for (int i = 0; i < size; i++)
+		{
+			isBingo = true;
+			for (int j = 0; j < size; j++)
+			{
+				if (bingo[j * size + i] != 0)
+				{
+					isBingo = false;
+					break;
+				}
+			}
+			if (isBingo)
+			{
+				bingoCount++;
+			}
+		}
+
+		// 대각선 빙고
+		isBingo = true;
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j < size; j++)
+			{
+				if (bingo[i * size + i] != 0)
+				{
+					isBingo = false;
+					break;
 				}
 			}
 		}
-
-		if (!isOverlap)
+		if (isBingo)
 		{
-			_bingo = bingoNumber;
-			break;
+			bingoCount++;
 		}
-	}
-}
 
-void ChangeBingo(int _selectNumber)
-{
-	for (int i = 0; i < 5; i++)
-	{
-		for (int j = 0; j < 5; j++)
-		{
-			if (bingo[i][j] == _selectNumber)
-			{
-				bingo[i][j] = 0;
-			}
-		}
-	}
-}
-
-void CheckBingo()
-{
-	bingoCount = 0;
-	bool isBingo = false;
-
-	// 가로 빙고
-	for (int i = 0; i < 5; i++)
-	{
 		isBingo = true;
-		for (int j = 0; j < 5; j++)
+		for (int i = 0; i < size; i++)
 		{
-			if (bingo[i][j] != 0)
+			for (int j = 0; j < size; j++)
 			{
-				isBingo = false;
-				break;
+				if (bingo[((size-1) - i) * size + i] != 0)
+				{
+					isBingo = false;
+					break;
+				}
 			}
 		}
 		if (isBingo)
@@ -101,104 +151,74 @@ void CheckBingo()
 		}
 	}
 
-	// 세로 빙고
-	for (int i = 0; i < 5; i++)
+	void RefreshUI()
 	{
-		isBingo = true;
-		for (int j = 0; j < 5; j++)
+		system("cls");
+
+		for (int i = 0; i < size; i++)
 		{
-			if (bingo[j][i] != 0)
+			for (int j = 0; j < size; j++)
 			{
-				isBingo = false;
-				break;
+				if (bingo[i * size + j] == 0)
+				{
+					cout << "\t";
+				}
+				else
+				{
+					cout << bingo[i * size + j] << "\t";
+				}
 			}
+			cout << endl;
 		}
-		if (isBingo)
-		{
-			bingoCount++;
-		}
+
+		cout << "현재 " << bingoCount << "줄의 빙고가 완성되었습니다." << endl;
 	}
 
-	// 대각선 빙고
-	isBingo = true;
-	for (int i = 0; i < 5; i++)
+	int GetBingoCount()
 	{
-		for (int j = 0; j < 5; j++)
-		{
-			if (bingo[i][i] != 0)
-			{
-				isBingo = false;
-				break;
-			}
-		}
-	}
-	if (isBingo)
-	{
-		bingoCount++;
+		return bingoCount;
 	}
 
-	isBingo = true;
-	for (int i = 0; i < 5; i++)
-	{
-		for (int j = 0; j < 5; j++)
-		{
-			if (bingo[4 - i][i] != 0)
-			{
-				isBingo = false;
-				break;
-			}
-		}
-	}
-	if (isBingo)
-	{
-		bingoCount++;
-	}
-}
+};
+
+Bingo bingo;
+
+int setBingoSize = 0;
 
 void Init()
 {
-	for (int i = 0; i < 5; i++)
-	{
-		for (int j = 0; j < 5; j++)
-		{
-			CreateBing(bingo[i][j]);
-		}
-	}
+	cout << "빙고 크기를 입력해 주세요 : ";
+	cin >> setBingoSize;
+
+	bingo.Create(setBingoSize);
+	bingo.RefreshUI();
 }
 
-void RefreshUI()
+void Update()
 {
-	system("cls");
-	for (int i = 0; i < 5; i++)
-	{
-		for (int j = 0; j < 5; j++)
-		{
-			if (bingo[i][j] == 0)
-			{
-				cout << "\t";
-			}
-			else 
-			{
-				cout << bingo[i][j] << "\t";
-			}
-		}
-		cout << endl;
-	}
+	int selectNumber = 0;
+	cout << "숫자를 입력해 주세요 : ";
+	cin >> selectNumber;
 
-	cout << "현재 " << bingoCount << "줄의 빙고가 완성되었습니다." << endl;
+	bingo.Select(selectNumber);
+	bingo.CheckBingo();
+	bingo.RefreshUI();
 }
 
 int main()
 {
 	Init();
-	RefreshUI();
 
 	while (true)
 	{
-		cout << "숫자를 입력해 주세요 : ";
-		cin >> selectNumber;
-		ChangeBingo(selectNumber);
-		CheckBingo();
-		RefreshUI();
+		Update();
+
+		if (bingo.GetBingoCount() == (2 * setBingoSize) + 2)
+		{
+			system("cls");
+			cout << "모든 빙고가 완성되었습니다." << endl;
+			break;
+		}
+		
 	}
 }

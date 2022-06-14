@@ -1,5 +1,5 @@
 // 6.	Joker를 포함한 53장의 카드를 섞은 후, 두 명의 플레이어에게 7장씩의 카드를 배분하는 프로그램을 만드시오.
-// ♠♣♥◆ 네 개의 기호 + 기호 별 각각 A, 2 ~ 10, J, Q, K 값의 카드 존재
+// ♠ ♣ ♥ ◆ 네 개의 기호 + 기호 별 각각 A, 2 ~ 10, J, Q, K 값의 카드 존재
 //
 // 
 // [ Solution ]
@@ -24,141 +24,204 @@
 //     52			: Joker
 //
 
+// Deck타입
+// 1. 모든 덱은 카드가 중복되지 않아야 한다.
+
+
+
+
 #include <iostream>
 #include <sstream> 
 
-#define CARD_QUANTITY 53;
+#define CARD_QUANTITY 53
+#define MAX_PLAYER_CARD 7
 
-int cardNumber = 0;
-int maxPlayerCard = 7;
-
-class Player
+template <size_t PLAYER_CARD>
+class Deck
 {
 private : 
-	int* playerCard = new int[maxPlayerCard];
+	int playerCard[PLAYER_CARD] = { 0 };
+	bool isUsed[CARD_QUANTITY] = { false };
 
 public :
-	Player()
+	Deck() = default;
+	~Deck() = default;
+
+	// Make() : 카드를 7장 뽑아서 덱을 구성한다. 단 카드가 충분치 않은 경우 만들어지지 못할 수 있다.
+	bool Make()
 	{
-		memset(playerCard, 0, maxPlayerCard);
+
+
+		int cardNumber = 0;
+
+		for (int i = 0; i < PLAYER_CARD; i++)
+		{
+			do
+			{
+				cardNumber = rand() % CARD_QUANTITY;
+			} while (isUsed[cardNumber]);
+
+			isUsed[cardNumber] = true;
+
+			playerCard[i] = cardNumber;
+		}
 	}
 
-	~Player()
+	// ToString() : 현제 덱의 카드를 표현하는 문자열을 만든다. 카드가 없는 경우 "The deck is empty"로 반환한다.
+	std::string ToString()
 	{
-		delete[] playerCard;
-	}
+		std::stringstream ss;
+		for (int i = 0; i < PLAYER_CARD; i++)
+		{
+			int cardType = playerCard[i] / 13;
+			int cardNumber = playerCard[i] % 13;
 
-	int getCard(int playerCardNumber)
-	{
-		return playerCard[playerCardNumber];
-	}
+			// Lookup Table
+			static const std::string CARD_TYPE[] = { "♠", "♣", "♥", "◆", "Joker" };
+			static const std::string CARD_NUMBER[] = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
 
-	void setCard(int playerCardNumber, int cardNumber)
-	{
-		playerCard[playerCardNumber] = cardNumber;
+			if (cardType == 4)
+			{
+				ss << "Joker" << "\t";
+			}
+			else
+			{
+				ss << CARD_TYPE[cardType] << CARD_NUMBER[cardNumber] << "\t";
+			}
+		}
+		return ss.str();
 	}
 };
 
-Player player1;
-Player player2;
+Deck<MAX_PLAYER_CARD> player1;
+Deck<MAX_PLAYER_CARD> player2;
 
-void GiveCard(Player& _player, int _turn)
-{
-	while (true)
-	{
-		bool isOverlap = false;
-		cardNumber = rand() % CARD_QUANTITY;
+//void GiveCard(Player& _player, int _turn)
+//{
+//	while (true)
+//	{
+//		bool isOverlap = false;
+//		cardNumber = rand() % CARD_QUANTITY;
+//
+//		for (int j = 0; j <= _turn; j++)
+//		{
+//			if (player1.getCard(j) == cardNumber || player2.getCard(j) == cardNumber)
+//			{
+//				isOverlap = true;
+//			}
+//		}
+//
+//		if (!isOverlap)
+//		{
+//			break;
+//		}
+//	}
+//	_player.setCard(_turn, cardNumber);
+//}
 
-		for (int j = 0; j <= _turn; j++)
-		{
-			if (player1.getCard(j) == cardNumber || player2.getCard(j) == cardNumber)
-			{
-				isOverlap = true;
-			}
-		}
-
-		if (!isOverlap)
-		{
-			break;
-		}
-	}
-	_player.setCard(_turn, cardNumber);
-}
-
-std::string Render(int _cardNumber)
-{
-	std::stringstream ss;
-
-	if (_cardNumber == 52)
-	{
-		ss << "Joker";
-		return ss.str();
-	}
-
-	switch (_cardNumber / 13)
-	{
-	case 0 :
-		ss << "♠";
-		break;
-	case 1:
-		ss << "♣";
-		break;
-	case 2:
-		ss << "♥";
-		break;
-	case 3:
-		ss << "◆";
-		break;
-	}
-
-	switch (_cardNumber % 13)
-	{
-	case 0:
-		ss << "A";
-		break;
-	case 10 :
-		ss << "J";
-		break;
-	case 11 :
-		ss << "Q";
-		break;
-	case 12 :
-		ss << "K";
-		break;
-	
-	default:
-		ss << (_cardNumber % 13 + 1);
-		break;
-	}
-
-	return ss.str();
-}
+//std::string Render(int _cardNumber)
+//{
+//	std::stringstream ss;
+//
+//	int cardType = _cardNumber / 13;
+//	int cardNumber = _cardNumber % 13;
+//
+//	// Lookup Table
+//	static const std::string CARD_TYPE[] = { "♠", "♣", "♥", "◆", "Joker" };
+//	static const std::string CARD_NUMBER[] = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
+//
+//	if (cardType == 4)
+//	{
+//		ss << "Joker";
+//		return ss.str();
+//	}
+//
+//	ss << CARD_TYPE[cardType] << CARD_NUMBER[cardNumber];
+//	return ss.str();
+//
+//	/*if (_cardNumber == 52)
+//	{
+//		ss << "Joker";
+//		return ss.str();
+//	}
+//
+//	switch (_cardNumber / 13)
+//	{
+//	case 0 :
+//		ss << "♠";
+//		break;
+//	case 1:
+//		ss << "♣";
+//		break;
+//	case 2:
+//		ss << "♥";
+//		break;
+//	case 3:
+//		ss << "◆";
+//		break;
+//	}
+//
+//	switch (_cardNumber % 13)
+//	{
+//	case 0:
+//		ss << "A";
+//		break;
+//	case 10 :
+//		ss << "J";
+//		break;
+//	case 11 :
+//		ss << "Q";
+//		break;
+//	case 12 :
+//		ss << "K";
+//		break;
+//	
+//	default:
+//		ss << (_cardNumber % 13 + 1);
+//		break;
+//	}*/
+//
+//}
 
 int main()
 {
 	srand(time(nullptr));
 
-	// 카드 배분
-	for (int i = 0; i < maxPlayerCard; i++)
-	{
-		GiveCard(player1, i);
-		GiveCard(player2, i);
-	}
+	// 카드 배부
+	player1.Make();
+	player2.Make();
+
+	
 
 	// 카드 표시
-	std::cout << "Player 1 : ";
-	for (int i = 0; i < maxPlayerCard; i++)
-	{
-		std::cout << Render(player1.getCard(i)) << " ";
-	}
-
-	std::cout << "\n";
-
-	std::cout << "Player 2 : ";
-	for (int i = 0; i < maxPlayerCard; i++)
-	{
-		std::cout << Render(player2.getCard(i)) << " ";
-	}
+	std::cout << "Player 1 : " << player1.ToString() << "\n";
+	std::cout << "Player 2 : " << player2.ToString() << "\n";
 }
 
-
+//
+//int isUsedCard[53] = { false };
+//
+//void PickCard(int* _deck, int _maxPick)
+//{
+//	// 중복되지 않게 카드를 뽑아야 함
+//	// 카드는 정수값 [0, 53]
+//	srand(time(NULL));
+//
+//	bool isPick = false;
+//	int pickCard = 0;
+//	do
+//	{
+//		pickCard = rand() % 53;
+//		isPick = false;
+//		for (int i = 0; i < _maxPick; i++)
+//		{
+//			if (isUsedCard[pickCard])
+//			{
+//				isPick = true;
+//				break;
+//			}
+//		}
+//	} while (isPick);
+//	isUsedCard[pickCard] = true;
+//
+//}
