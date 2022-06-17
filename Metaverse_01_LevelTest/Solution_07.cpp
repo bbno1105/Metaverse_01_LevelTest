@@ -42,7 +42,13 @@ private:
 	int size = 0;
 
 public:
-	void Create(int _size)
+	Bingo() = default;
+	~Bingo()
+	{
+		delete[] bingo;
+	}
+
+	void const Create(int _size)
 	{
 		size = _size;
 		bingo = new int[size * size];
@@ -63,7 +69,7 @@ public:
 		delete[] isUsed;
 	}
 
-	void Select(int _selectNumber)
+	void const SelectNumber(int _selectNumber)
 	{
 		for (int i = 0; i < size * size; i++)
 		{
@@ -74,7 +80,7 @@ public:
 		}
 	}
 
-	void CheckBingo()
+	void const Check()
 	{
 		bingoCount = 0;
 		bool isBingo = false;
@@ -151,7 +157,7 @@ public:
 		}
 	}
 
-	void RefreshUI()
+	void const RefreshUI()
 	{
 		system("cls");
 
@@ -168,15 +174,24 @@ public:
 					cout << bingo[i * size + j] << "\t";
 				}
 			}
-			cout << endl;
+			cout << endl << endl;
 		}
 
 		cout << "현재 " << bingoCount << "줄의 빙고가 완성되었습니다." << endl;
 	}
 
-	int GetBingoCount()
+	bool const isGame()
 	{
-		return bingoCount;
+		if (bingoCount == (2 * size) + 2)
+		{
+			system("cls");
+			cout << "모든 빙고가 완성되었습니다." << endl;
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 };
@@ -200,25 +215,16 @@ void Update()
 	cout << "숫자를 입력해 주세요 : ";
 	cin >> selectNumber;
 
-	bingo.Select(selectNumber);
-	bingo.CheckBingo();
+	bingo.SelectNumber(selectNumber);
+	bingo.Check();
 	bingo.RefreshUI();
 }
 
 int main()
 {
 	Init();
-
-	while (true)
+	while (bingo.isGame())
 	{
 		Update();
-
-		if (bingo.GetBingoCount() == (2 * setBingoSize) + 2)
-		{
-			system("cls");
-			cout << "모든 빙고가 완성되었습니다." << endl;
-			break;
-		}
-		
 	}
 }

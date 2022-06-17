@@ -27,9 +27,6 @@
 // Deck타입
 // 1. 모든 덱은 카드가 중복되지 않아야 한다.
 
-
-
-
 #include <iostream>
 #include <sstream> 
 
@@ -40,8 +37,11 @@ template <size_t PLAYER_CARD>
 class Deck
 {
 private : 
-	int playerCard[PLAYER_CARD] = { 0 };
-	bool isUsed[CARD_QUANTITY] = { false };
+	int playerCard[PLAYER_CARD] = { -1 };
+
+public:
+	static bool isUsed[CARD_QUANTITY];
+	static int remainCard;
 
 public :
 	Deck() = default;
@@ -50,8 +50,11 @@ public :
 	// Make() : 카드를 7장 뽑아서 덱을 구성한다. 단 카드가 충분치 않은 경우 만들어지지 못할 수 있다.
 	bool Make()
 	{
-
-
+		if (remainCard < 7)
+		{
+			return false;
+		}
+		
 		int cardNumber = 0;
 
 		for (int i = 0; i < PLAYER_CARD; i++)
@@ -65,11 +68,23 @@ public :
 
 			playerCard[i] = cardNumber;
 		}
+
+		remainCard -= 7;
+		return true;
 	}
 
 	// ToString() : 현제 덱의 카드를 표현하는 문자열을 만든다. 카드가 없는 경우 "The deck is empty"로 반환한다.
 	std::string ToString()
 	{
+		if (playerCard[0] == -1)
+		{
+			return "세팅할 카드가 없는데요";
+		}
+		// 1. 플레이어 카드 수 만큼 순회한다
+		// 2. 순회하며 카드의 타입과 수를 판별한다
+		// 3. 판별한 결과를 차례대로 저장한다.
+		// 4. 저장한 데이터를 반환한다.
+
 		std::stringstream ss;
 		for (int i = 0; i < PLAYER_CARD; i++)
 		{
@@ -92,6 +107,9 @@ public :
 		return ss.str();
 	}
 };
+
+bool Deck<MAX_PLAYER_CARD>::isUsed[CARD_QUANTITY] = { false };
+int Deck<MAX_PLAYER_CARD>::remainCard = CARD_QUANTITY;
 
 Deck<MAX_PLAYER_CARD> player1;
 Deck<MAX_PLAYER_CARD> player2;
@@ -187,15 +205,22 @@ int main()
 {
 	srand(time(nullptr));
 
-	// 카드 배부
-	player1.Make();
-	player2.Make();
+	std::cout << "카드 세팅 전 : " << player1.ToString() << "\n";
 
+	// 카드 배부
+	if (player1.Make() && player2.Make())
+	{
+		// 카드 표시
+		std::cout << "Player 1 : " << player1.ToString() << "\n";
+		std::cout << "Player 2 : " << player2.ToString() << "\n";
+	}
+	else
+	{
+		std::cout << "카드가 부족합니다." << "\n";
+	}
 	
 
-	// 카드 표시
-	std::cout << "Player 1 : " << player1.ToString() << "\n";
-	std::cout << "Player 2 : " << player2.ToString() << "\n";
+
 }
 
 //

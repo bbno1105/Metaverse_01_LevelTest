@@ -104,7 +104,7 @@ using namespace std;
 //}
 
 
-class Snail
+class SnailArray
 {
 private :
 	int* arr = nullptr;
@@ -120,8 +120,8 @@ private :
 	};
 
 public : 
-	Snail() = default;
-	~Snail()
+	SnailArray() = default;
+	~SnailArray()
 	{
 		delete[] arr;
 	}
@@ -185,11 +185,12 @@ public :
 				cout << arr[r * size + c] << "\t";
 			}
 			cout << "\n";
+			cout << "\n";
 		}
 	}
 };
 
-Snail snail;
+SnailArray snailArray;
 
 int main()
 {
@@ -198,7 +199,7 @@ int main()
 	int size;
 	cin >> size;
 
-	snail.Create(size);
-	snail.Move();
-	snail.RefreshUI();
+	snailArray.Create(size);
+	snailArray.Move();
+	snailArray.RefreshUI();
 }
